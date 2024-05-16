@@ -1,4 +1,4 @@
-print("5558")
+print("1234")
 print("Kradoor")
 print("Kradoor")
 print("Kradoor")
