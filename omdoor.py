@@ -1,6 +1,6 @@
 print("KKKKKKUY")
 print("hello")
-print("Kradoor")
+print("world")
 print("Kradoor")
 print("Kradoor")
 print("Kradoor")
