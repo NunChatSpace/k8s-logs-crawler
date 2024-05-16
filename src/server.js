@@ -53,7 +53,7 @@ const startLogStreaming = async () => {
                 follow: true,
                 tailLines: 50,
                 pretty: true,
-                timestamps: false,
+                timestamps: true,
             });
         });
     } catch (err) {
@@ -62,7 +62,7 @@ const startLogStreaming = async () => {
     }
 };
 
-app.listen(3000, () => {
-    console.log("Server is running on localhost:3000");
+app.listen(3002, () => {
+    console.log("Server is running on localhost:3002");
     startLogStreaming();
 });
