@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html>
+    <script>
+        const source = new EventSource('/stream');
+    
+        source.onmessage = (event) => {
+            const logData = event.data;
+            // Update the webpage with the new logData
+            document.getElementById('log').textContent = logData;
+        };
+    </script>
+    <head>
+        <title><%= title %></title>
+    </head>
+    <body>
+        <div id="log" style="height: 90%; overflow-y: scroll;">
+
+        </div>
+    </body>
+</html>

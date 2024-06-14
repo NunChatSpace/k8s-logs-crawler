@@ -10,6 +10,7 @@ app.set("view engine", "ejs");
 // Set views directory
 app.set("views", path.join(__dirname, "/views"));
 
+let logData = "";
 app.get("/", (req, res) => {
     const data = {
         title: "Home",
@@ -18,8 +19,23 @@ app.get("/", (req, res) => {
     res.render("index", data);
 });
 
-const startLogStreaming = async () => {
-    const namespace = "prod";
+app.get("/stream", (req, res) => {
+    const env = req.query.env || "dev";
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    startLogStreaming(res, env);
+
+    // If the client disconnects, stop sending updates
+    req.on("close", () => {
+        res.end();
+    });
+});
+
+const startLogStreaming = async (res, env) => {
+    const namespace = env;
     const kc = new k8s.KubeConfig();
     kc.loadFromDefault();
     const log = new k8s.Log(kc);
@@ -41,7 +57,9 @@ const startLogStreaming = async () => {
             logStream.on("data", (chunk) => {
                 // use write rather than console.log to prevent double line feed
                 const data = `${podname}: ${chunk}`;
-                process.stdout.write(data);
+                logData = "\n" + data;
+                // process.stdout.write(data);
+                res.write(`${logData}`);
             });
 
             logStreams.push({
@@ -53,7 +71,7 @@ const startLogStreaming = async () => {
                 follow: true,
                 tailLines: 50,
                 pretty: true,
-                timestamps: true,
+                timestamps: false,
             });
         });
     } catch (err) {
@@ -64,5 +82,4 @@ const startLogStreaming = async () => {
 
 app.listen(3002, () => {
     console.log("Server is running on localhost:3002");
-    startLogStreaming();
 });
